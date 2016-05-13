@@ -1,6 +1,6 @@
-nbproject/
-node_modules/
 lib/composer.lock
 lib/vendor/
-.idea/
+nbproject/
+node_modules/
 npm-debug.log
+.idea/

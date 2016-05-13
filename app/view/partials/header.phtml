@@ -1,14 +1,18 @@
 <?php
-require_once __PATH__ . "/app/config.php";
+use Underscore\Underscore as _;
 
 ?>
 <div class="row app-bar">
     <div class="column">
         <a href="/" class="option">Home</a>
-        <?php foreach (app_configs::getNamespaces() as $namespace): ?>
+        <?php
+        _::each(app_configs::getNamespaces(), function($namespace){
+            ?>
             <a href="/<?= $namespace ?>" class="option">
                 <?= $namespace ?>
-            </a>
-        <?php endforeach; ?>
+            </a>    
+            <?php
+        });
+        ?>
     </div>
 </div>

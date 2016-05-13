@@ -1,8 +1,5 @@
 <?php
 
-require_once __PATH__ . "/app/model/New.php";
-require_once __PATH__ . "/lib/utils.php";
-
 class Service_MyNew {
     //constants
     
@@ -13,89 +10,75 @@ class Service_MyNew {
     }
 }
 
-//Resource SCRUD Management
+// Resource SCRUD Management
 class Service_MyNew_News_Resource {
 
     public function listNews(array $optionParams = null) {
-        //[id, title, status, dateCreate] params
-        $CONDITIONALS_PART = [];
+        $alternateAttributes = [
+            "newId"         => "new_id",
+            "status"        => "status"
+        ];
         
-        if($optionParams && is_array($optionParams)){
-            foreach ($optionParams as $key => $value){
-                switch ($key){
-                    case "id":
-                        if(is_array($value)){
-                            $value = array_map(function($element){
-                                return "'{$element}'";
-                            }, $value);
-                            
-                            $value = implode(",", $value);
-                            
-                            $CONDITIONALS_PART[]= "{$key} IN ({$value})";
-                        }else{
-                            $CONDITIONALS_PART[]= "{$key} = '{$value}'";
-                        }
-                        break;
-                }
-            }
-        }
-        
-        $CONDITIONALS_PART_STRING = ($CONDITIONALS_PART)? "WHERE " . implode(" AND ", $CONDITIONALS_PART) : null;
+        $CONDITIONALS_PART_STRING = get_conditional_string($alternateAttributes, $optionParams);
         
         $query = "
-        SELECT id,
+        SELECT new_id,
         title,
         description,
         date_create,
         status
-        FROM news
+        FROM `new`
         {$CONDITIONALS_PART_STRING}
         ";
         
-        $newsData = db::fetchAll($query);
+        $arrayObjects = db::util()->fetchAll($query);
         
-        $news = [];
+        $results = [];
         
-        foreach ($newsData as $newData){
-            $newData = array_merge((array) $newData, [
-                "dateCreate" => $newData->date_create
+        foreach ($arrayObjects as $object){
+            $results[] = new _New([
+                "newId"         => $object->new_id,
+                "title"         => $object->title,
+                "description"   => $object->description,
+                "dateCreate"    => $object->date_create,
+                "status"        => $object->status
             ]);
-            
-            $news[] = new _New($newData);
         }
         
-        return $news;
+        return $results;
     }
     
-    public function insert(_New $new){
-        $affectedRows = (bool) db::insert("news", [
-          "title"       => $new->getTitle(),
-          "description" => $new->getDescription(),
-          "date_create" => $new->getDateCreate(),
-          "status"      => $new->getStatus()
+    public function insert(_New $object){
+        $insertedData =  db::util()->insert("new", [
+            "title"       => $object->getTitle(),
+            "description" => $object->getDescription(),
+            "date_create" => $object->getDateCreate(),
+            "status"      => $object->getStatus()
         ]);
         
-        return $affectedRows;
+        return $insertedData->success;
     }
     
-    public function update(_New $new){
-        $affectedRows = (bool) db::update("news", [
-          "title"       => $new->getTitle(),
-          "description" => $new->getDescription(),
-          "date_create" => $new->getDateCreate(),
-          "status"      => $new->getStatus()
+    public function get($id){
+        return array_pop($this->listNews([
+            "newId" => $id
+        ]));
+    }
+    
+    public function update(_New $object){
+        return db::util()->update("new", [
+            "title"       => $object->getTitle(),
+            "description" => $object->getDescription(),
+            "date_create" => $object->getDateCreate(),
+            "status"      => $object->getStatus()
         ], [
-          "id"          => $new->getId()
+            "new_id"      => $object->getNewId()
         ]);
-        
-        return $affectedRows;
     }
     
-    public function delete($newId){
-        $affectedRows = (bool) db::delete("news", [
-            "id" => $newId
+    public function delete($id){
+        return db::util()->delete("new", [
+            "new_id"    => $id
         ]);
-        
-        return $affectedRows;
     }
 }

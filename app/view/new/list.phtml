@@ -1,0 +1,101 @@
+<?php
+
+use Underscore\Underscore as _;
+
+$err    = $this->request->param("err");
+$news   = $this->news;
+
+switch ($err){
+    case CONTROLLER_NEW_FAILED_CREATE:
+        $messageError = "Error to create new!";
+        break;
+    case CONTROLLER_NEW_FAILED_DELETE:
+        $messageError = "Error to delete new!";
+        break;
+    case CONTROLLER_NEW_FAILED_UPDATE:
+        $messageError = "Error to update new!";
+        break;
+    case CONTROLLER_NEW_SUCCESS_CREATE:
+        $messageError = "New created!";
+        break;
+    case CONTROLLER_NEW_SUCCESS_DELETE:
+        $messageError = "New deleted!";
+        break;
+    case CONTROLLER_NEW_SUCCESS_UPDATE:
+        $messageError = "New updated!";
+        break;
+}
+
+?>
+<!-- begin content -->
+<div class="row app-container">
+    <div class="row">
+        <div class="column">
+            <a class="button button-primary" href="/new/create">Create</a>
+        </div>
+    </div>
+    <?php 
+    if($err){ 
+        ?> 
+        <div class="row">
+            <div class="column">
+                <div>
+                    <?= $messageError ?>
+                </div>
+            </div>
+        </div>
+        <?php 
+    } 
+    ?> 
+    <div class="row">
+        <div class="column">
+            <h1>News</h1>
+            <table class="u-full-width news-list">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Title</th>
+                        <th class="display">Date Create</th>
+                        <th class="display">Status</th>
+                        <th>Options</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    if($news){
+                        _::each($news, function(_New $new) {
+                            ?>
+                            <tr>
+                                <td>
+                                    <?= $new->getNewId() ?>
+                                </td>
+                                <td>
+                                    <?= substr_with_dots($new->getTitle(), 20) ?>
+                                </td>
+                                <td class="display">
+                                    <?= $new->getDateCreate() ?>
+                                </td>
+                                <td class="display">
+                                    <?= $new->getStatus() ?>
+                                </td>
+                                <td>
+                                    <a href="/new/<?= $new->getNewId() ?>">Edit</a>
+                                    <a href="/new/<?= $new->getNewId() ?>/delete">Delete</a>
+                                </td>
+                            </tr>
+                            <?php
+                        });
+                    }else{
+                        ?>
+                            <tr>
+                                <td colspan="5">There aren't news</td>
+                            </tr>    
+                        <?php
+                    }
+                    ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!-- end content -->

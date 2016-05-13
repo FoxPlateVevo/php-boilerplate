@@ -1,5 +1,7 @@
 <?php
 
+namespace Toolkit\Model;
+
 class Model {
 
     final public function __construct() {

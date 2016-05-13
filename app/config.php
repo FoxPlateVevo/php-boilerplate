@@ -2,8 +2,8 @@
 
 class app_configs{
     private static $namespaces = [
-        'users',
-        'news'
+        'user',
+        'new'
     ];
     
     public static function getNamespaces() {

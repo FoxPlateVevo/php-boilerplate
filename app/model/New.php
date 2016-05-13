@@ -1,20 +1,20 @@
 <?php
 
-require_once __PATH__ . "/app/model/Model.php";
+use Toolkit\Model\Model;
 
 class _New extends Model {
     //constants
     const STATUS_PUBLIC     = "public";
     const STATUS_PRIVATE    = "private";
     
-    protected $id;
+    protected $newId;
     protected $title;
     protected $description;
     protected $dateCreate;
     protected $status;
     
-    function getId() {
-        return $this->id;
+    function getNewId() {
+        return $this->newId;
     }
 
     function getTitle() {
@@ -33,8 +33,8 @@ class _New extends Model {
         return $this->status;
     }
 
-    function setId($id) {
-        $this->id = $id;
+    function setNewId($newId) {
+        $this->newId = $newId;
     }
 
     function setTitle($title) {

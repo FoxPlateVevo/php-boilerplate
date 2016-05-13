@@ -1,5 +1,20 @@
 {
     "require": {
-        "klein/klein": "dev-master"
+        "bdelespierre/underscore"   : "dev-master",
+        "klein/klein"               : "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "Toolkit\\": "src/Toolkit/"
+        },
+        "classmap": [
+            "../app/model/",
+            "../app/service/",
+            "util/"
+        ],
+        "files": [
+            "../app/config.php",
+            "functions.php"
+        ]
     }
 }

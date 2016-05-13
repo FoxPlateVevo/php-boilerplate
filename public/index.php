@@ -1,41 +1,65 @@
 <?php
-require_once "../lib/vendor/autoload.php";
-require_once "../app/config.php";
+require "../lib/vendor/autoload.php";
 
-//define constants in the enviroment
+use Klein\Klein;
+
+/*
+ * Set initial configuration
+ */
+// Define principal path in the enviroment
 define('__PATH__', __DIR__ . '/../');
 
-$klein = new \Klein\Klein();
+// Set default time zone
+date_default_timezone_set('America/Lima');
 
+// Ignore all error reportings
+error_reporting(E_ERROR);
+
+/*
+ * Start application
+ */
+$klein = new Klein();
+
+// Creating validators
+$klein->service()->addValidator('true', function ($variable) {
+    return filter_var($variable, FILTER_VALIDATE_BOOLEAN);
+});
+
+$klein->service()->addValidator('empty', function ($variable) {
+    if(is_string($variable)){
+        $variable = trim($variable);
+    }
+    
+    return empty($variable);
+});
+
+// Start session for the application
+$klein->service()->startSession();
+
+// Set default layout for all views of the application
 $klein->service()->layout(__PATH__ . "/app/view/layouts/default.phtml");
 
-//set home site
+// Set home site
 $klein->respond("GET", "/?", function ($request, $response, $service) {
-    //header params
+    // Header params
     $service->pageTitle = "My title Application";
     
-    //content params
+    // Content params
     $service->title = "My simple App with PHP";
     
-    //render
-//    $service->layout(__PATH__ . "/app/view/layouts/default.phtml");
+    // Render
     $service->render(__PATH__ . "/app/view/home/home.phtml");
 });
 
-//set namespaces
+// Set router namespaces
 foreach(app_configs::getNamespaces() as $controller) {
     // Include all routes defined in a file under a given namespace
     $klein->with("/{$controller}", __PATH__ . "/app/controller/{$controller}.php");
 }
 
-$klein->respond("GET", "/sample", function ($request, $response, $service) {
-    $service->layout(__PATH__ . "/app/view/layouts/empty.phtml");
-    $service->render(__PATH__ . "/app/view/sample/sample.phtml");
-});
-
 // Using exact code behaviors via switch/case
 $klein->onHttpError(function ($code, $router) {
-    //$router is a Klein object
+    // $router is the Klein object
     switch ($code) {
         case 404:
             $router->service()->layout(__PATH__ . "/app/view/layouts/empty.phtml");
@@ -51,6 +75,13 @@ $klein->onHttpError(function ($code, $router) {
                 'Oh no, a bad error happened that caused a '. $code
             );
     }
+});
+
+// Catch produced errors
+$klein->onError(function ($klein, $errorMessage) {
+    $klein->response()->json([
+        "message" => $errorMessage
+    ]);
 });
 
 $klein->dispatch();
